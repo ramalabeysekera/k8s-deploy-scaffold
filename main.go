@@ -36,6 +36,14 @@ func main() {
 			if obj.CreateNamespace {
 				k8s.CreateNamespace(obj.Namespace)
 			}
+
+			if obj.CreateServiceAccount {
+				if obj.EnableIRSA {
+					k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, true)
+				} else {
+					k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, false)
+				}
+			}
 		}
 	}
 }
