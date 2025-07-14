@@ -1,0 +1,13 @@
+---
+testWorkload:
+  - namespace: test-ns
+    create_namespace: true
+    create_service_account: true
+    service_account_name: test-ns
+    enable_irsa: true
+testWorkload2:
+  - namespace: test-ns2
+    create_namespace: true
+    create_service_account: true
+    service_account_name: test-ns2
+    enable_irsa: false
