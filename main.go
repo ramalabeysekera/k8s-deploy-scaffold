@@ -15,10 +15,15 @@ type workloadObject struct {
 	CreateServiceAccount bool   `yaml:"create_service_account"`
 	ServiceAccountName   string `yaml:"service_account_name"`
 	EnableIRSA           bool   `yaml:"enable_irsa"`
+	OIDCProvider         string `yaml:"oidc_provider"`
 }
 
 func main() {
-	fmt.Println("Reading from config.yml")
+	fmt.Println("=======================")
+	fmt.Println("🚀 K8s Deploy Scaffold")
+	fmt.Println("=======================")
+	fmt.Println("📖 Reading configuration from: config.yml")
+	fmt.Println("=========================================")
 	b, err := os.ReadFile("config.yml")
 	if err != nil {
 		log.Println(err)
@@ -30,20 +35,22 @@ func main() {
 		log.Print(err)
 	}
 
-	for _, groupObjects := range workloads {
-		//fmt.Printf("Workload group: %s\n", groupName)
+	for groupName, groupObjects := range workloads {
 		for _, obj := range groupObjects {
+
+			fmt.Printf("Workload: %s\n", groupName)
 			if obj.CreateNamespace {
 				k8s.CreateNamespace(obj.Namespace)
 			}
 
 			if obj.CreateServiceAccount {
-				if obj.EnableIRSA {
-					k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, true)
-				} else {
-					k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, false)
+				err := k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, obj.EnableIRSA, obj.OIDCProvider)
+
+				if err != nil {
+					fmt.Println(err)
 				}
 			}
+			fmt.Println("==============================")
 		}
 	}
 }

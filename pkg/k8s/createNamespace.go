@@ -11,10 +11,11 @@ import (
 )
 
 func CreateNamespace(namespace string) error {
-	fmt.Printf("Creating namespace: %s\n", namespace)
+	fmt.Printf("🔧 Creating Namespace: %s\n", namespace)
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
+		fmt.Printf("❌ Error: could not create Kubernetes client: %v\n", err)
 		panic(err.Error())
 	}
 
@@ -25,11 +26,12 @@ func CreateNamespace(namespace string) error {
 	namespaceObj, err := clientset.CoreV1().Namespaces().Create(context.TODO(), &v1.Namespace{ObjectMeta: obj}, metav1.CreateOptions{})
 
 	if errors.IsAlreadyExists(err) {
-		fmt.Printf("Namespace %s already exist\n", namespace)
+		fmt.Printf("⚠️ Namespace '%s' already exists\n", namespace)
 		return nil
 	} else if err != nil {
+		fmt.Printf("❌ Error: failed to create namespace '%s': %v\n", namespace, err)
 		return err
 	}
-	fmt.Printf("Created namespace %s at %v\n", namespace, namespaceObj.CreationTimestamp)
+	fmt.Printf("✅ Created Namespace '%s' at %v\n", namespace, namespaceObj.CreationTimestamp)
 	return nil
 }

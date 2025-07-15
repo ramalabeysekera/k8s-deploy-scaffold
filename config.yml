@@ -3,11 +3,13 @@ testWorkload:
   - namespace: test-ns
     create_namespace: true
     create_service_account: true
-    service_account_name: test-ns
+    service_account_name: serviceaccount1
     enable_irsa: true
+    oidc_provider: oidc.eks.ap-southeast-1.amazonaws.com/id/XXXXXXXXXXXXXXXXXXXXXXXX
 testWorkload2:
   - namespace: test-ns2
     create_namespace: true
     create_service_account: true
-    service_account_name: test-ns2
+    service_account_name: serviceaccount2
     enable_irsa: false
+    oidc_provider: oidc.eks.ap-northeast-1.amazonaws.com/id/XXXXXXXXXXXXXXXXXXXXXXXX
