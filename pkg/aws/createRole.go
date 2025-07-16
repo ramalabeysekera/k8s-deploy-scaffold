@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/ramalabeysekera/k8s-deploy-scaffold/helpers"
 )
 
 func CreateIamRole(config aws.Config, serviceAccountName string, accountId string, namespaceName string, oidcProvider string) (string, error) {
@@ -51,6 +52,7 @@ func CreateIamRole(config aws.Config, serviceAccountName string, accountId strin
 		return "", err
 	}
 
-	fmt.Printf("✅ Created role %s at %v\n", serviceAccountName, createRoleOutput.Role.CreateDate)
+	helpers.LogVerbose("IAM policy: %s\n", policyString)
+	helpers.LogVerbose("✅ Created role %s at %v\n", serviceAccountName, createRoleOutput.Role.CreateDate)
 	return *createRoleOutput.Role.Arn, nil
 }

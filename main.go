@@ -1,10 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/ramalabeysekera/k8s-deploy-scaffold/helpers"
 	"github.com/ramalabeysekera/k8s-deploy-scaffold/pkg/k8s"
 	"gopkg.in/yaml.v3"
 )
@@ -19,6 +20,19 @@ type workloadObject struct {
 }
 
 func main() {
+	verbose := flag.Bool("verbose", false, "Enable verbose output")
+	// Add kubeconfig flag
+	kubeconfig := flag.String("kubeconfig", "", "(optional) absolute path to the kubeconfig file")
+	flag.Parse()
+	helpers.Verbose = *verbose
+
+	// If kubeconfig is not set, use default path
+	if *kubeconfig == "" {
+		home, _ := os.UserHomeDir()
+		*kubeconfig = fmt.Sprintf("%s/.kube/config", home)
+	}
+	k8s.InitConfig(*kubeconfig)
+
 	fmt.Println("=======================")
 	fmt.Println("🚀 K8s Deploy Scaffold")
 	fmt.Println("=======================")
@@ -26,13 +40,15 @@ func main() {
 	fmt.Println("=========================================")
 	b, err := os.ReadFile("config.yml")
 	if err != nil {
-		log.Println(err)
+		fmt.Printf("❌ Error: failed to read config.yml: %v\n", err)
+		return
 	}
 
 	workloads := make(map[string][]workloadObject)
 	err = yaml.Unmarshal(b, &workloads)
 	if err != nil {
-		log.Print(err)
+		fmt.Printf("❌ Error: failed to unmarshal config: %v\n", err)
+		return
 	}
 
 	for groupName, groupObjects := range workloads {
@@ -47,7 +63,7 @@ func main() {
 				err := k8s.CreateServiceAccount(obj.ServiceAccountName, obj.Namespace, obj.EnableIRSA, obj.OIDCProvider)
 
 				if err != nil {
-					fmt.Println(err)
+					fmt.Printf("❌ Error: %v\n", err)
 				}
 			}
 			fmt.Println("==============================")

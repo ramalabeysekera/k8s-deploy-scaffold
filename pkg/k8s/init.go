@@ -1,27 +1,20 @@
 package k8s
 
 import (
-	"flag"
+	"fmt"
+
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
-	"path/filepath"
 )
 
 var config *rest.Config
 var err error
 
-func init() {
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
+// InitConfig initializes the k8s config with the provided kubeconfig path
+func InitConfig(kubeconfigPath string) {
+	config, err = clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
+		fmt.Printf("❌ Error: failed to build kubeconfig: %v\n", err)
 		panic(err.Error())
 	}
 }

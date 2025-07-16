@@ -17,6 +17,7 @@ func CreateServiceAccount(serviceAccount string, namespaceName string, enableIRS
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
+		fmt.Printf("❌ Error: could not create Kubernetes client: %v\n", err)
 		panic(err.Error())
 	}
 
@@ -48,7 +49,7 @@ func CreateServiceAccount(serviceAccount string, namespaceName string, enableIRS
 	serviceAccountObj, err := clientset.CoreV1().ServiceAccounts(namespaceName).Create(context.TODO(), &v1.ServiceAccount{ObjectMeta: metaObj}, metav1.CreateOptions{})
 
 	if errors.IsAlreadyExists(err) {
-		fmt.Printf("⚠️  Service Account '%s' already exists in namespace '%s'\n", serviceAccount, namespaceName)
+		fmt.Printf("⚠️ Service Account '%s' already exists in namespace '%s'\n", serviceAccount, namespaceName)
 		return nil
 	} else if err != nil {
 		return err

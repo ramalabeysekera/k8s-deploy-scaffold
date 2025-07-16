@@ -10,6 +10,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
+// Verbose controls verbose logging
+var Verbose bool
+
+func LogVerbose(format string, a ...interface{}) {
+	if Verbose {
+		fmt.Printf(format, a...)
+	}
+}
+
 func LoadAwsConfig() (aws.Config, string) {
 
 	// Get AWS profile name from user selection
@@ -25,11 +34,12 @@ func LoadAwsConfig() (aws.Config, string) {
 
 	// Handle any config loading errors
 	if err != nil {
+		fmt.Printf("❌ Error: failed to load AWS config: %v\n", err)
 		panic(err)
 	}
 
-	fmt.Printf("🔑 Using AWS profile: %s\n", profile)
-	fmt.Printf("🌎 Using AWS region: %s\n", cfg.Region)
+	LogVerbose("🔑 Using AWS profile: %s\n", profile)
+	LogVerbose("🌎 Using AWS region: %s\n", cfg.Region)
 
 	// Create a new STS client using the loaded config
 	client := sts.NewFromConfig(cfg)
@@ -37,12 +47,12 @@ func LoadAwsConfig() (aws.Config, string) {
 	// Get the caller identity to validate credentials and get account info
 	result, err := client.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
 	if err != nil {
-		panic("failed to get caller identity, " + err.Error())
+		log.Fatalf("❌ Error: failed to get caller identity: %v\n", err)
 	}
 
 	// Print account and identity information
-	fmt.Printf("🏦 Using AWS account ID: %s\n", *result.Account)
-	fmt.Printf("🙍 Using caller identity: %s\n", *result.Arn)
+	LogVerbose("🏦 Using AWS account ID: %s\n", *result.Account)
+	LogVerbose("🙍 Using caller identity: %s\n", *result.Arn)
 
 	return cfg, *result.Account
 }
