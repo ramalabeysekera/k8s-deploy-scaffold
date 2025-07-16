@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -21,10 +22,12 @@ func LogVerbose(format string, a ...interface{}) {
 
 func LoadAwsConfig() (aws.Config, string) {
 
-	// Get AWS profile name from user selection
-	profile := "default"
+	profile, ok := os.LookupEnv("aws_profile")
 
-	// Validate that a profile was selected
+	if !ok {
+		profile = "default"
+	}
+
 	if profile == "" {
 		log.Fatal("Need a profile to continue")
 	}
